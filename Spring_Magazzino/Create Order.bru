@@ -1,0 +1,24 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/magazzino/order
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "customer": { "idCustomer": 2},
+       "products": [
+         {"idProduct": 1, "quantity": 2},
+         {"idProduct": 3}
+                  ],
+    "orderName": "luigi's order",
+    "totalPayment": 75.9,
+    "status": true
+  }
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Create Customer
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:8080/magazzino/customer
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "fullName": "Fabio Neri",
+      "email": "fabioneri@email.com",
+      "address": "Via Roma 7"
+  }
+}
