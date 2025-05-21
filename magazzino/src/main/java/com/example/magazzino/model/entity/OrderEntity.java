@@ -1,15 +1,7 @@
 package com.example.magazzino.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.example.magazzino.model.OrderStatus;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -20,19 +12,35 @@ public class OrderEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "idCustomer")
     private CustomerEntity customer;
+
     @Column(unique = true)
     private String orderName;
     @Column(nullable = false)
     private Double totalPayment;
     private Boolean status;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
     @ManyToMany
     @JoinTable(
             name = "order_product",
             joinColumns = @JoinColumn(name = "id_order"),
             inverseJoinColumns = @JoinColumn(name = "id_product")
+            // aggiungere quantità
+            // CASCADE
     )
     private List<ProductEntity> products;
 

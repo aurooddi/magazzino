@@ -17,8 +17,6 @@ public class ProductEntity {
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
-    private Integer quantity;
-    @Column(nullable = false)
     private String category;
     @Column(nullable = false)
     private Double price;
@@ -28,18 +26,16 @@ public class ProductEntity {
     public ProductEntity() {
     }
 
-    public ProductEntity(Long id, String description, Integer quantity, String category, Double price, Integer stock) {
+    public ProductEntity(Long id, String description, String category, Double price, Integer stock) {
         this.id = id;
         this.description = description;
-        this.quantity = quantity;
         this.category = category;
         this.price = price;
         this.stock = stock;
     }
 
-    public ProductEntity(String description, Integer quantity, String category, Double price, Integer stock) {
+    public ProductEntity(String description, String category, Double price, Integer stock) {
         this.description = description;
-        this.quantity = quantity;
         this.category = category;
         this.price = price;
         this.stock = stock;
@@ -59,14 +55,6 @@ public class ProductEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public String getCategory() {
@@ -98,8 +86,7 @@ public class ProductEntity {
         return "ProductEntity{" +
                 "idProduct=" + id +
                 ", description='" + description + '\'' +
-                ", quantity=" + quantity +
-                ", category='" + category + '\'' +
+                ", category='" + category +
                 ", price=" + price +
                 ", stock='" + stock + '\'' +
                 '}';

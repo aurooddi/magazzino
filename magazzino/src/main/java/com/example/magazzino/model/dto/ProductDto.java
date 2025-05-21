@@ -4,7 +4,6 @@ public class ProductDto {
 
     private Long idProduct;
     private String description;
-    private Integer quantity;
     private String category;
     private Double price;
     private Integer Stock;
@@ -23,14 +22,6 @@ public class ProductDto {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public String getCategory() {

@@ -2,9 +2,7 @@ package com.example.magazzino.service;
 
 import com.example.magazzino.mapper.ProductMapper;
 import com.example.magazzino.model.dto.ProductDto;
-import com.example.magazzino.model.entity.OrderEntity;
 import com.example.magazzino.model.entity.ProductEntity;
-import com.example.magazzino.repository.OrderRepository;
 import com.example.magazzino.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,45 +21,32 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public void create(ProductDto productDto) {
+    public ProductDto create(ProductDto productDto) {
         ProductEntity product = ProductMapper.mapProductToEntity(productDto);
 
         Optional<ProductEntity> productEntityOptional = productRepository
-                .searchByCategory(product.getCategory());
+                .findByCategoryIgnoreCaseAndDescriptionIgnoreCase(product.getCategory(), product.getDescription());
         if(productEntityOptional.isPresent()) {
-            throw new IllegalStateException("ID already exists");
+            throw new IllegalStateException("Description and already exists");
         }
-
-        productRepository.save(product);
-    }
-
-    public ProductEntity getProduct(Long idProduct, Double price) {
-        ProductEntity product = productRepository.findById(idProduct)
-                .orElseThrow(() -> new IllegalStateException(
-                        "student with id " + idProduct + " does not exists")
-                );
-        return product;
+       return ProductMapper.mapProductToDto(productRepository.save(product));
     }
 
     public void update(Long idProduct, String description, String category, Integer quantity, Integer stock) {
         ProductEntity product = productRepository.findById(idProduct)
                 .orElseThrow(() -> new IllegalStateException(
-                        "student with id " + idProduct + " does not exists")
+                        "product with id " + idProduct + " does not exists")
                 );
         if(description != null && !description.isEmpty() && !Objects.equals(product.getDescription(), description))   {
             product.setDescription(description);
         }
 
         if(category != null && !category.isEmpty() && !Objects.equals(product.getDescription(), category)) {
-            Optional<ProductEntity> productEntity = productRepository.searchByCategory(category);
+            Optional<ProductEntity> productEntity = productRepository.findByCategoryIgnoreCaseAndDescriptionIgnoreCase(category, description);
             if (productEntity.isPresent()) {
                 throw new IllegalStateException("category exists");
             }
             product.setCategory(category);
-        }
-
-        if(product.getQuantity() != null && !Objects.equals(product.getQuantity(), quantity)) {
-            product.setQuantity(quantity);
         }
 
         if(product.getStock() != null && !Objects.equals(product.getStock(), stock)) {

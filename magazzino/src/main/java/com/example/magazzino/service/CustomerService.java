@@ -22,21 +22,21 @@ public class CustomerService {
     }
 
     // RIFATTA
-    public void create(CustomerDto customerDto) {
+    public CustomerDto create(CustomerDto customerDto) {
         CustomerEntity customer = CustomerMapper.mapCustomerToEntity(customerDto);
 
         Optional<CustomerEntity> customerEntityOptional = customerRepository
                 .searchByEmail(customer.getEmail());
         if(customerEntityOptional.isPresent()) {
-            throw new IllegalStateException("ID already exists");
+            throw new IllegalStateException("Email already exists");
         }
-        customerRepository.save(customer);
+        return CustomerMapper.mapCustomerToDto(customerRepository.save(customer));
     }
 
     public void update(Long idCustomer, String fullName, String email, String address) {
         CustomerEntity customer = customerRepository.findById(idCustomer)
                 .orElseThrow(() -> new IllegalStateException(
-                        "student with id " + idCustomer + " does not exists")
+                        "Customer with id " + idCustomer + " does not exists")
                 );
         if(fullName != null && !fullName.isEmpty() && !Objects.equals(customer.getFullName(), fullName))   {
             customer.setFullName(fullName);

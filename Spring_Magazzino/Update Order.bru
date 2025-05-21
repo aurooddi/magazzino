@@ -5,7 +5,29 @@ meta {
 }
 
 put {
-  url: http://localhost:8080/magazzino/order
-  body: none
+  url: http://localhost:8080/magazzino/order/:id
+  body: json
   auth: none
+}
+
+params:query {
+  : 
+}
+
+params:path {
+  id: 2
+}
+
+body:json {
+  {
+      "customer": { "idCustomer": 2},
+       "products": [
+         {"idProduct": 1, "quantity": 10},
+         {"idProduct": 2, "quantity": 14},
+         {"idProduct": 3, "quantity": 30}
+                  ],
+    "orderName": "luisa's order",
+    "totalPayment": 0,
+    "status": true
+  }
 }

@@ -1,16 +1,21 @@
 package com.example.magazzino.service;
 
+import com.example.magazzino.mapper.CustomerMapper;
 import com.example.magazzino.mapper.OrderMapper;
+import com.example.magazzino.model.OrderStatus;
 import com.example.magazzino.model.dto.OrderDto;
 import com.example.magazzino.model.dto.ProductDto;
+import com.example.magazzino.model.dto.QuantityDto;
 import com.example.magazzino.model.entity.CustomerEntity;
 import com.example.magazzino.model.entity.OrderEntity;
 import com.example.magazzino.model.entity.ProductEntity;
+import com.example.magazzino.model.entity.QuantityEntity;
 import com.example.magazzino.repository.CustomerRepository;
 import com.example.magazzino.repository.OrderRepository;
 import com.example.magazzino.repository.ProductRepository;
+import com.example.magazzino.repository.QuantityRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,72 +26,37 @@ import java.util.Optional;
 @Service
 public class OrderService {
 
-    @Autowired
-    private final ProductService productService;
-
-    @Autowired
     private final CustomerRepository customerRepository;
 
-    @Autowired
-    private final ProductRepository productRepository;
-
-    @Autowired
     private final OrderRepository orderRepository;
 
-    public OrderService(ProductService productService, CustomerRepository customerRepository, ProductRepository productRepository, OrderRepository orderRepository) {
-        this.productService = productService;
+
+    public OrderService(CustomerRepository customerRepository, OrderRepository orderRepository) {
         this.customerRepository = customerRepository;
-        this.productRepository = productRepository;
+
         this.orderRepository = orderRepository;
+
     }
 
     @Transactional
-    public OrderEntity create(OrderDto orderDto) {
+    public OrderDto create(OrderDto orderDto) {
+        // Creiamo l'ordine partendo dal DTO
         OrderEntity order = OrderMapper.mapToOrderEntity(orderDto);
 
-        Optional<OrderEntity> orderEntityOptional = orderRepository
-                .searchByOrderName(order.getOrderName());
+        // Controlliamo se l'ordine esiste già
+        Optional<OrderEntity> orderEntityOptional = orderRepository.searchByOrderName(order.getOrderName());
         if (orderEntityOptional.isPresent()) {
             throw new IllegalStateException("Order already exists");
         }
-
-        // Prendo un cliente
-        CustomerEntity customer = customerRepository.findById(orderDto.getCustomer().getIdCustomer()).
-                orElseThrow(() -> new IllegalStateException("Customer with ID "
+        // Prendiamo il cliente associato all'ordine
+        CustomerEntity customer = customerRepository.findById(orderDto.getCustomer().getIdCustomer())
+                .orElseThrow(() -> new IllegalStateException("Customer with ID "
                         + orderDto.getCustomer().getIdCustomer() + " does not exist"));
-
-        Double totalPayment = order.getTotalPayment();
-        List<ProductEntity> productEntities = new ArrayList<>();
-
-        // Controllo se il prodotto esiste oppure ce ne sia abbastanza
-        for (ProductDto productOrder : orderDto.getProducts()) {
-            ProductEntity product = productRepository.findById(productOrder.getIdProduct())
-                    .orElseThrow(() -> new IllegalStateException("Product with ID " + productOrder.getIdProduct() + " does not exist"));
-
-            if (product.getStock() < productOrder.getQuantity()) {
-                throw new IllegalStateException("Not enough stock for product " + productOrder.getIdProduct());
-            }
-
-            // Aggiorna stock e totale pagamento
-            product.setStock(product.getStock() - productOrder.getQuantity());
-            totalPayment += product.getPrice() * productOrder.getQuantity();
-
-            // Salva il prodotto aggiornato e aggiungilo all'ordine
-            productRepository.save(product);
-            productEntities.add(product);
-        }
-        // Crea l'ordine
-//        order.setCustomer(customer);
-//        order.setProducts(productEntities);
-//        order.setTotalPayment(totalPayment);
-//        order.setStatus(true); // Imposta lo stato dell'ordine a "confermato"
-
-        // Aggiorna il pagamento del cliente
-        order.setTotalPayment(totalPayment);
+        // Salviamo il cliente aggiornato
         customerRepository.save(customer);
-
+        // Salviamo l'ordine
         orderRepository.save(order);
-        return order;
+        return OrderMapper.mapToOrderDto(orderRepository.save(order));
     }
 
     public void update(Long idOrder, String orderName, Boolean status) {
@@ -114,6 +84,14 @@ public class OrderService {
 
     public List<OrderDto> getAll() {
         return OrderMapper.mapToOrderDto(orderRepository.findAll());
+    }
+
+    public OrderEntity updateOrderStatus(Long orderId, OrderStatus status) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Ordine non trovato"));
+        order.setOrderStatus(status);
+        return orderRepository.save(order);
+
     }
 
 }

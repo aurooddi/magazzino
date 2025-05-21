@@ -6,6 +6,15 @@ meta {
 
 post {
   url: http://localhost:8080/magazzino/product
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "description": "Mele",
+    "category": "Cartoleria",
+    "price": 0.60,
+    "stock": 100
+  }
 }

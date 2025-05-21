@@ -5,7 +5,15 @@ meta {
 }
 
 put {
-  url: http://localhost:8080/magazzino/customer
+  url: http://localhost:8080/magazzino/customer/:id?fullName=Luigi Bianchi
   body: none
   auth: none
+}
+
+params:query {
+  fullName: Luigi Bianchi
+}
+
+params:path {
+  id: 1
 }
